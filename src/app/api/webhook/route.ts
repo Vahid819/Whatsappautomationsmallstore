@@ -1,5 +1,4 @@
-
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 import { handleIncomingMessage } from "@/handlers/message.handler";
 import { WhatsAppWebhook } from "@/types/whatsapp";
 
@@ -21,27 +20,25 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: Request) {
-  try {
-    const body: WhatsAppWebhook = await req.json();
+  const body: WhatsAppWebhook = await req.json();
 
-    console.log("========== NEW WEBHOOK ==========");
-    console.log(JSON.stringify(body, null, 2));
+  console.log("🔥 WEBHOOK HIT");
+  console.log(JSON.stringify(body, null, 2));
 
+  const value = body.entry?.[0]?.changes?.[0]?.value;
+
+  // Handle incoming customer messages
+  if (value?.messages?.length) {
     await handleIncomingMessage(body);
-
-    return NextResponse.json({
-      success: true,
-    });
-  } catch (error) {
-    console.error("Webhook Error:", error);
-
-    return NextResponse.json(
-      {
-        success: false,
-      },
-      {
-        status: 500,
-      }
-    );
+    return Response.json({ success: true });
   }
+
+  // Handle status updates (sent, delivered, read)
+  if (value?.statuses?.length) {
+    console.log(`📨 Message Status: ${value.statuses[0].status}`);
+    return Response.json({ success: true });
+  }
+
+  console.log("Unknown webhook event.");
+  return Response.json({ success: true });
 }

@@ -1,6 +1,6 @@
 // src/handlers/message.handler.ts
 
-import { saveCustomer } from "@/services/customer.service";
+import { createCustomer } from "@/services/customer.service";
 import { sendTextMessage } from "@/services/whatsapp.service";
 import { WhatsAppWebhook } from "@/types/whatsapp";
 
@@ -26,11 +26,7 @@ export async function handleIncomingMessage(body: WhatsAppWebhook) {
     console.log("💬 Message:", text);
 
     // Save customer to Firestore
-    await saveCustomer({
-      phone,
-      name,
-      lastMessage: text,
-    });
+    await createCustomer(phone, name, text);
 
     // Auto reply
     await sendTextMessage(

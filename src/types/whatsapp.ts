@@ -18,8 +18,12 @@ export interface Change {
 export interface Value {
   messaging_product: string;
   metadata: Metadata;
+
   contacts?: Contact[];
   messages?: Message[];
+
+  // Added for message status updates
+  statuses?: Status[];
 }
 
 export interface Metadata {
@@ -28,18 +32,42 @@ export interface Metadata {
 }
 
 export interface Contact {
-  profile: {
+  profile?: {
     name: string;
   };
+
   wa_id: string;
+  user_id?: string;
 }
 
 export interface Message {
   from: string;
+  from_user_id?: string;
+
   id: string;
   timestamp: string;
+
   type: "text";
+
   text: {
     body: string;
+  };
+}
+
+export interface Status {
+  id: string;
+
+  status: "sent" | "delivered" | "read" | "failed";
+
+  timestamp: string;
+
+  recipient_id: string;
+  recipient_user_id?: string;
+
+  pricing?: {
+    billable: boolean;
+    pricing_model: string;
+    category: string;
+    type: string;
   };
 }

@@ -2,43 +2,49 @@
 
 import { adminDb } from "@/lib/firebase/admin";
 import { FieldValue } from "firebase-admin/firestore";
+import { ConversationState } from "@/types/conversation";
 
-export interface CustomerData {
+export interface Customer {
   phone: string;
   name?: string;
-  lastMessage: string;
+  address?: string;
+  mobile?: string;
+  lastMessage?: string;
+  state: ConversationState;
 }
 
-export async function saveCustomer(data: CustomerData) {
-  try {
-    console.log("🚀 Saving customer:", data);
+const customerCollection = adminDb.collection("customers");
 
-    const customerRef = adminDb.collection("customers").doc(data.phone);
+// Get customer
+export async function getCustomer(phone: string) {
+  const doc = await customerCollection.doc(phone).get();
 
-    const customerSnap = await customerRef.get();
+  if (!doc.exists) return null;
 
-    console.log("Document exists:", customerSnap.exists);
+  return doc.data() as Customer;
+}
 
-    if (!customerSnap.exists) {
-      await customerRef.set({
-        phone: data.phone,
-        name: data.name || "",
-        lastMessage: data.lastMessage,
-        createdAt: FieldValue.serverTimestamp(),
-        updatedAt: FieldValue.serverTimestamp(),
-      });
+// Create customer
+export async function createCustomer(phone: string, name:string, lastMessage:string) {
+  await customerCollection.doc(phone).set({
+    phone,
+    name: "",
+    address: "",
+    mobile: "",
+    lastMessage: "",
+    state: ConversationState.WAITING_NAME,
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+}
 
-      console.log("✅ New customer created");
-    } else {
-      await customerRef.update({
-        lastMessage: data.lastMessage,
-        updatedAt: FieldValue.serverTimestamp(),
-      });
-
-      console.log("✅ Customer updated");
-    }
-  } catch (error) {
-    console.error("❌ Error saving customer:", error);
-    throw error;
-  }
+// Update customer
+export async function updateCustomer(
+  phone: string,
+  data: Partial<Customer>
+) {
+  await customerCollection.doc(phone).update({
+    ...data,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
 }
