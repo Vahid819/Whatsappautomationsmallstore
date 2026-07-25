@@ -1,7 +1,4 @@
-// src/handlers/message.handler.ts
-
-import { createCustomer } from "@/services/customer.service";
-import { sendTextMessage } from "@/services/whatsapp.service";
+import { handleConversation } from "@/services/conversation.service";
 import { WhatsAppWebhook } from "@/types/whatsapp";
 
 export async function handleIncomingMessage(body: WhatsAppWebhook) {
@@ -25,21 +22,7 @@ export async function handleIncomingMessage(body: WhatsAppWebhook) {
     console.log("📞 Phone:", phone);
     console.log("💬 Message:", text);
 
-    // Save customer to Firestore
-    await createCustomer(phone, name, text);
-
-    // Auto reply
-    await sendTextMessage(
-      phone,
-      `👋 Hello ${name}!
-
-Welcome to MominEgg 🥚
-
-Thank you for contacting us.
-How can we help you today?`
-    );
-
-    console.log("✅ Auto reply sent");
+    await handleConversation(phone, text);
   } catch (error) {
     console.error("❌ Error handling message:", error);
   }
