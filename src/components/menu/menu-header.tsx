@@ -16,7 +16,7 @@ export function MenuHeader() {
         </p>
       </div>
 
-      <Button onClick={() => router.push("/menu/add")}>        
+      <Button onClick={() => router.push("/products/add")}>        
         <Plus className="mr-2 h-4 w-4" />
         Add Menu
       </Button>

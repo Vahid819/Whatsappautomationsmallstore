@@ -53,8 +53,6 @@ export function ProductForm() {
       toast.success("Product added successfully!");
 
       form.reset();
-
-      router.push("/products");
     });
   }
 

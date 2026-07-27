@@ -2,15 +2,27 @@ import { adminDb } from "@/lib/firebase/admin";
 import { Timestamp } from "firebase-admin/firestore";
 import { Menu } from "@/types/menu";
 
-const menuCollection = adminDb.collection("menus");
+const menuCollection = adminDb.collection("products");
 
 export async function getMenus(): Promise<Menu[]> {
-  const snapshot = await menuCollection.orderBy("createdAt", "desc").get();
+  const snapshot = await menuCollection.get();
 
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...(doc.data() as Omit<Menu, "id">),
-  }));
+  return snapshot.docs.map((doc) => {
+    const data = doc.data();
+
+    return {
+      id: doc.id,
+      productNumber: data.productNumber,
+      name: data.name,
+      description: data.description,
+      category: data.category,
+      price: data.price,
+      available: data.available,
+      image: data.image ?? "",
+      createdAt: data.createdAt?.toDate().toISOString() ?? null,
+      updatedAt: data.updatedAt?.toDate().toISOString() ?? null,
+    };
+  });
 }
 
 export async function getMenu(id: string): Promise<Menu | null> {
@@ -18,9 +30,19 @@ export async function getMenu(id: string): Promise<Menu | null> {
 
   if (!doc.exists) return null;
 
+  const data = doc.data()!;
+
   return {
     id: doc.id,
-    ...(doc.data() as Omit<Menu, "id">),
+    productNumber: data.productNumber,
+    name: data.name,
+    description: data.description,
+    category: data.category,
+    price: data.price,
+    available: data.available,
+    image: data.image ?? "",
+    createdAt: data.createdAt?.toDate().toISOString() ?? null,
+    updatedAt: data.updatedAt?.toDate().toISOString() ?? null,
   };
 }
 

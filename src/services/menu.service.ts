@@ -28,6 +28,7 @@ export async function getMenuItems(): Promise<MenuItem[]> {
   }));
 }
 
+
 /**
  * Get menu item by number (1,2,3...)
  */
@@ -51,10 +52,25 @@ export async function getMenuItemByNumber(
 }
 
 /**
+ * Get available menu items (WhatsApp)
+ */
+export async function getAvailableMenus(): Promise<MenuItem[]> {
+  const snapshot = await menuCollection
+    .where("available", "==", true)
+    .orderBy("productNumber", "asc")
+    .get();
+
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...(doc.data() as Omit<MenuItem, "id">),
+  }));
+}
+
+/**
  * Generate WhatsApp menu message
  */
 export async function getMenuMessage(): Promise<string> {
-  const menuItems = await getMenuItems();
+  const menuItems = await getAvailableMenus();
 
   if (menuItems.length === 0) {
     return "❌ Sorry, no products are available right now.";

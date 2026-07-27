@@ -1,25 +1,16 @@
-
-
 export interface Menu {
   id: string;
-
+  productNumber: number;
   name: string;
-
   description: string;
-
   category: string;
-
   price: number;
-
-  image?: string;
-
   available: boolean;
 
-  featured: boolean;
+  featured?: boolean;
+  preparationTime?: number;
 
-  preparationTime: number;
-
-  createdAt: Date;
-
-  updatedAt: Date;
+  image?: string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
