@@ -79,38 +79,37 @@ export async function getAvailableMenus(): Promise<MenuItem[]> {
  * Generate WhatsApp menu message
  */
 export async function getMenuMessage(): Promise<string> {
-  const menuItems = await getAvailableMenus();
+  const products = await getAvailableMenus();
 
-  if (menuItems.length === 0) {
-    return "❌ Sorry, no products are available right now.";
+  if (products.length === 0) {
+    return "❌ No products available.";
   }
 
   let message = "🥚 *PRIME PROTEINS MENU*\n\n";
 
   let currentCategory = "";
 
-  for (const item of menuItems) {
-    if (currentCategory !== item.category) {
-      currentCategory = item.category;
+  const emojiMap: Record<string, string> = {
+    Eggs: "🥚",
+    Paneer: "🧀",
+    "Green Peas": "🫛",
+    "Sweet Corn": "🌽",
+  };
 
-      const emoji =
-        currentCategory === "Eggs"
-          ? "🥚"
-          : currentCategory === "Paneer"
-          ? "🧀"
-          : currentCategory === "Green Peas"
-          ? "🫛"
-          : currentCategory === "Sweet Corn"
-          ? "🌽"
-          : "📦";
+  for (const product of products) {
+    if (currentCategory !== product.category) {
+      currentCategory = product.category;
 
-      message += `${emoji} *${currentCategory}*\n`;
+      message += `${
+        emojiMap[currentCategory] ?? "📦"
+      } *${currentCategory}*\n`;
     }
 
-    message += `${item.productNumber}. ${item.description} .... ₹${item.price}\n`;
+    message += `${product.productNumber}. ${product.description} ........ ₹${product.price}\n`;
   }
 
   message += `
+
 ━━━━━━━━━━━━━━
 
 🛒 *Reply in this format*
