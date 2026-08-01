@@ -4,12 +4,21 @@ import { adminDb } from "@/lib/firebase/admin";
 
 export interface MenuItem {
   id: string;
+
   productNumber: number;
+
   name: string;
-  price: number;
-  available: boolean;
+
+  variant: string;
+
+  description: string;
+
   category: string;
-}
+
+  price: number;
+
+  available: boolean;
+} 
 
 const menuCollection = adminDb.collection("products");
 
@@ -76,29 +85,44 @@ export async function getMenuMessage(): Promise<string> {
     return "❌ Sorry, no products are available right now.";
   }
 
-  let message = `🍳 *Welcome to MominEgg!*\n\n`;
-  message += `📋 *Today's Menu*\n\n`;
+  let message = "🥚 *PRIME PROTEINS MENU*\n\n";
 
-  menuItems.forEach((item) => {
-    message += `${item.productNumber}️⃣ *${item.name}* - ₹${item.price}\n`;
-  });
+  let currentCategory = "";
+
+  for (const item of menuItems) {
+    if (currentCategory !== item.category) {
+      currentCategory = item.category;
+
+      const emoji =
+        currentCategory === "Eggs"
+          ? "🥚"
+          : currentCategory === "Paneer"
+          ? "🧀"
+          : currentCategory === "Green Peas"
+          ? "🫛"
+          : currentCategory === "Sweet Corn"
+          ? "🌽"
+          : "📦";
+
+      message += `${emoji} *${currentCategory}*\n`;
+    }
+
+    message += `${item.productNumber}. ${item.description} .... ₹${item.price}\n`;
+  }
 
   message += `
+━━━━━━━━━━━━━━
 
-━━━━━━━━━━━━━━━
-
-Reply in this format:
+🛒 *Reply in this format*
 
 1 x2
 4 x1
 8 x3
 
-Example:
+Example
 
 1 x2
-5 x1
-
-Type one product per line.`;
+5 x1`;
 
   return message;
 }
