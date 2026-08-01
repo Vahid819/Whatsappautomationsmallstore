@@ -88,10 +88,15 @@ async function getNextOrderNumber(): Promise<number> {
   return (lastOrder.orderNumber ?? 1000) + 1;
 }
 
+
+
 export async function createOrder(
   data: Omit<Order, "id" | "orderNumber">
 ): Promise<string> {
   try {
+    console.log("========== CREATE ORDER ==========");
+    console.log(JSON.stringify(data, null, 2));
+
     const orderNumber = await getNextOrderNumber();
 
     const docRef = await orderCollection.add({

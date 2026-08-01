@@ -167,6 +167,12 @@ Please send *MENU* to view the latest menu.`
       // Save Cart
       // ===========================================
 
+      const savedCustomer = await getCustomer(phone);
+
+console.log(
+  "Saved cart:",
+  JSON.stringify(savedCustomer?.cart, null, 2)
+);
       await updateCustomer(phone, {
         cart,
         state: ConversationState.WAITING_CONFIRMATION,
@@ -237,6 +243,11 @@ Please send *MENU* to view the latest menu.`
           (sum, item) => sum + item.total,
           0
         );
+
+        console.log(
+  "Order items:",
+  JSON.stringify(latestCustomer.cart, null, 2)
+);
 
         const orderId = await createOrder({
           customerId: latestCustomer.phone,
