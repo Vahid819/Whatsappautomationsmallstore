@@ -23,19 +23,32 @@ function mapOrder(
 
     orderNumber: data.orderNumber,
 
+    customerId: data.customerId,
+
     customerPhone: data.customerPhone,
     customerName: data.customerName,
+
     customerAddress: data.customerAddress,
+    customerLandmark: data.customerLandmark ?? "",
+    customerInstructions: data.customerInstructions ?? "",
 
-    items: data.items,
+    items: data.items ?? [],
 
-    subtotal: data.subtotal,
+    subtotal: data.subtotal ?? 0,
+    deliveryCharge: data.deliveryCharge ?? 0,
+    discount: data.discount ?? 0,
+    totalAmount: data.totalAmount ?? 0,
+
+    paymentMethod: data.paymentMethod,
+    paymentStatus: data.paymentStatus,
 
     status: data.status,
 
-    createdAt: data.createdAt?.toDate().toISOString() ?? null,
+    createdAt:
+      data.createdAt?.toDate().toISOString() ?? null,
 
-    updatedAt: data.updatedAt?.toDate().toISOString() ?? null,
+    updatedAt:
+      data.updatedAt?.toDate().toISOString() ?? null,
   };
 }
 
