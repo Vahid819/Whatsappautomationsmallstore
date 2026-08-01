@@ -2,9 +2,19 @@ export type OrderStatus =
   | "PENDING"
   | "ACCEPTED"
   | "PREPARING"
-  | "READY"
-  | "COMPLETED"
+  | "PACKED"
+  | "OUT_FOR_DELIVERY"
+  | "DELIVERED"
   | "CANCELLED";
+
+export type PaymentMethod =
+  | "COD"
+  | "UPI";
+
+export type PaymentStatus =
+  | "PENDING"
+  | "PAID"
+  | "FAILED";
 
 export interface OrderItem {
   productId: string;
@@ -20,13 +30,24 @@ export interface Order {
 
   orderNumber: number;
 
+  customerId: string;
+
   customerPhone: string;
   customerName: string;
+
   customerAddress: string;
+  customerLandmark?: string;
+  customerInstructions?: string;
 
   items: OrderItem[];
 
   subtotal: number;
+  deliveryCharge: number;
+  discount: number;
+  totalAmount: number;
+
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
 
   status: OrderStatus;
 

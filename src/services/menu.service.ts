@@ -83,7 +83,22 @@ export async function getMenuMessage(): Promise<string> {
     message += `${item.productNumber}️⃣ *${item.name}* - ₹${item.price}\n`;
   });
 
-  message += `\n💬 Reply with the *product number* to place your order.`;
+  message += `
+
+━━━━━━━━━━━━━━━
+
+Reply in this format:
+
+1 x2
+4 x1
+8 x3
+
+Example:
+
+1 x2
+5 x1
+
+Type one product per line.`;
 
   return message;
 }

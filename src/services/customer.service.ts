@@ -1,20 +1,26 @@
 import { adminDb } from "@/lib/firebase/admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { ConversationState } from "@/types/conversation";
+import { OrderItem } from "@/types/order";
 
 export interface Customer {
   phone: string;
+
   name: string;
+
   address: string;
+
   mobile: string;
+
+  landmark?: string;
+
+  instructions?: string;
+
   lastMessage: string;
 
   state: ConversationState;
 
-  selectedItemId?: string;
-  selectedItemName?: string;
-  selectedItemPrice?: number;
-  quantity?: number;
+  cart: OrderItem[];
 }
 
 export interface CreateCustomerInput {
@@ -22,6 +28,7 @@ export interface CreateCustomerInput {
   name: string;
   address: string;
   mobile: string;
+
   landmark?: string;
   instructions?: string;
 }
@@ -61,11 +68,7 @@ export async function createCustomer(data: CreateCustomerInput) {
 
     state: ConversationState.REGISTERED,
 
-    selectedItemId: "",
-    selectedItemName: "",
-    selectedItemPrice: 0,
-    quantity: 0,
-
+    cart: [],
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),
   });
