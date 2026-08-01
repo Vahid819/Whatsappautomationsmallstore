@@ -1,5 +1,5 @@
 // src/services/conversation.service.ts
-
+import { generateRegistrationToken } from "./registration-token.service";
 import {
     createCustomer,
     getCustomer,
@@ -19,77 +19,31 @@ export async function handleConversation(
     message: string
 ) {
     // Check if customer exists
-    const customer = await getCustomer(phone);
+const customer = await getCustomer(phone);
 
-    // First-time customer
-    if (!customer) {
-        await createCustomer(phone);
+// First-time customer
+if (!customer) {
+  const token = await generateRegistrationToken(phone);
 
-        await sendTextMessage(
-            phone,
-            `👋 Welcome to MominEgg 🥚
+  const registerUrl = (`${process.env.NEXT_PUBLIC_APP_URL}/register?token=${token}`);
+  
+  await sendTextMessage(
+    phone,
+    `👋 Welcome to *MominEgg* 🥚
 
-Before ordering, I need a few details.
+Before placing your first order, please complete your registration.
 
-😊 What is your full name?`
-        );
+📝 Register here:
+${registerUrl}
 
-        return;
-    }
+
+After registration, come back to WhatsApp and send *MENU* to start ordering.`
+  );
+
+  return;
+}
 
     switch (customer.state) {
-        // ===========================
-        // Ask Name
-        // ===========================
-        case ConversationState.WAITING_NAME:
-            await updateCustomer(phone, {
-                name: message,
-                state: ConversationState.WAITING_ADDRESS,
-            });
-
-            await sendTextMessage(
-                phone,
-                `📍 Thanks ${message}!
-
-Please enter your delivery address.`
-            );
-            break;
-
-        // ===========================
-        // Ask Address
-        // ===========================
-        case ConversationState.WAITING_ADDRESS:
-            await updateCustomer(phone, {
-                address: message,
-                state: ConversationState.WAITING_PHONE,
-            });
-
-            await sendTextMessage(
-                phone,
-                `📞 Please enter your mobile number.`
-            );
-            break;
-
-        // ===========================
-        // Ask Phone & Show Menu
-        // ===========================
-        case ConversationState.WAITING_PHONE: {
-            const menu = await getMenuMessage();
-
-            await updateCustomer(phone, {
-                mobile: message,
-                state: ConversationState.WAITING_MENU_SELECTION,
-            });
-
-            await sendTextMessage(
-                phone,
-                `✅ Registration completed successfully!
-
-${menu}`
-            );
-            break;
-        }
-
         // ===========================
         // Registered Customer
         // ===========================

@@ -1,5 +1,3 @@
-// src/services/customer.service.ts
-
 import { adminDb } from "@/lib/firebase/admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { ConversationState } from "@/types/conversation";
@@ -19,45 +17,72 @@ export interface Customer {
   quantity?: number;
 }
 
+export interface CreateCustomerInput {
+  phone: string;
+  name: string;
+  address: string;
+  mobile: string;
+  landmark?: string;
+  instructions?: string;
+}
+
 const customerCollection = adminDb.collection("customers");
 
 // Get customer
-export async function getCustomer(phone: string) {
+export async function getCustomer(phone: string): Promise<Customer | null> {
   const doc = await customerCollection.doc(phone).get();
 
-  if (!doc.exists) return null;
+  if (!doc.exists) {
+    return null;
+  }
 
   return doc.data() as Customer;
 }
 
+// Check if customer exists
+export async function customerExists(phone: string): Promise<boolean> {
+  const doc = await customerCollection.doc(phone).get();
+
+  return doc.exists;
+}
+
 // Create customer
-export async function createCustomer(phone: string) {
-await customerCollection.doc(phone).set({
-  phone,
-  name: "",
-  address: "",
-  mobile: "",
-  lastMessage: "",
+export async function createCustomer(data: CreateCustomerInput) {
+  await customerCollection.doc(data.phone).set({
+    phone: data.phone,
+    name: data.name,
+    address: data.address,
+    mobile: data.mobile,
 
-  state: ConversationState.WAITING_NAME,
+    landmark: data.landmark ?? "",
+    instructions: data.instructions ?? "",
 
-  selectedItemId: "",
-  selectedItemName: "",
-  selectedItemPrice: 0,
-  quantity: 0,
+    lastMessage: "",
 
-  createdAt: FieldValue.serverTimestamp(),
-  updatedAt: FieldValue.serverTimestamp(),
-});
+    state: ConversationState.REGISTERED,
+
+    selectedItemId: "",
+    selectedItemName: "",
+    selectedItemPrice: 0,
+    quantity: 0,
+
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
+  });
 }
 
 // Update customer
 export async function updateCustomer(
   phone: string,
   data: Partial<Customer>
-) {
+): Promise<void> {
   await customerCollection.doc(phone).update({
     ...data,
     updatedAt: FieldValue.serverTimestamp(),
   });
+}
+
+// Delete customer
+export async function deleteCustomer(phone: string): Promise<void> {
+  await customerCollection.doc(phone).delete();
 }
