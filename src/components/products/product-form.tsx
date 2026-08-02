@@ -18,15 +18,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useState } from "react";
+import { CreateCategoryDialog } from "@/components/products/category/create-category-dialog";
+
+import { Category } from "@/types/category";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+interface ProductFormProps {
+  categories: Category[];
+}
 
-export function ProductForm() {
+export function ProductForm({ categories }: ProductFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -88,25 +104,45 @@ export function ProductForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
+  <Label htmlFor="category">Category</Label>
 
-              <Input
-                id="category"
-                placeholder="Egg"
-                disabled={isPending}
-                {...form.register("category")}
-              />
+  <Select
+    value={form.watch("category")}
+    onValueChange={(value) =>
+      form.setValue("category", value ?? "")
+    }
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Select Category" />
+    </SelectTrigger>
 
-              <p className="text-xs text-muted-foreground">
-                Example: Egg, Chicken, Paneer
-              </p>
+    <SelectContent>
+      {categories.map((category) => (
+        <SelectItem
+          key={category.id}
+          value={category.name}
+        >
+          {category.icon} {category.name}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
 
-              {form.formState.errors.category && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.category.message}
-                </p>
-              )}
-            </div>
+  {form.formState.errors.category && (
+    <p className="text-sm text-destructive">
+      {form.formState.errors.category.message}
+    </p>
+  )}
+
+  <Button
+  type="button"
+  variant="link"
+  className="p-0 h-auto"
+  onClick={() => setCategoryDialogOpen(true)}
+>
+  + Create Category
+</Button>
+</div>
           </div>
 
           {/* Price & Available */}
@@ -213,6 +249,10 @@ export function ProductForm() {
           </div>
         </form>
       </CardContent>
+     <CreateCategoryDialog
+  open={categoryDialogOpen}
+  onOpenChange={setCategoryDialogOpen}
+/>
     </Card>
   );
 }

@@ -46,6 +46,16 @@ export async function getCustomer(phone: string): Promise<Customer | null> {
   return doc.data() as Customer;
 }
 
+export async function getCustomers(): Promise<Customer[]> {
+  const snapshot = await customerCollection
+    .orderBy("createdAt", "desc")
+    .get();
+
+  return snapshot.docs.map((doc) => ({
+    ...(doc.data() as Customer),
+  }));
+}
+
 // Check if customer exists
 export async function customerExists(phone: string): Promise<boolean> {
   const doc = await customerCollection.doc(phone).get();
