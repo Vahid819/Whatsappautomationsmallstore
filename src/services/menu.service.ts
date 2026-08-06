@@ -87,30 +87,27 @@ export async function getMenuMessage(): Promise<string> {
 
   let message = "🥚 *PRIME PROTEINS MENU*\n\n";
 
-  let currentCategory = "";
-
-  const emojiMap: Record<string, string> = {
-    Eggs: "🥚",
-    Paneer: "🧀",
-    "Green Peas": "🫛",
-    "Sweet Corn": "🌽",
-  };
+  const groupedProducts: Record<string, MenuItem[]> = {};
 
   for (const product of products) {
-    if (currentCategory !== product.category) {
-      currentCategory = product.category;
-
-      message += `${
-        emojiMap[currentCategory] ?? "📦"
-      } *${currentCategory}*\n`;
+    if (!groupedProducts[product.category]) {
+      groupedProducts[product.category] = [];
     }
 
-    message += `${product.productNumber}. ${product.description} ........ ₹${product.price}\n`;
+    groupedProducts[product.category].push(product);
   }
 
-  message += `
+  for (const category of Object.keys(groupedProducts)) {
+    message += `📦 *${category}*\n`;
 
-━━━━━━━━━━━━━━
+    for (const product of groupedProducts[category]) {
+      message += `${product.productNumber}. ${product.name} ........ ₹${product.price}\n`;
+    }
+
+    message += "\n";
+  }
+
+  message += `━━━━━━━━━━━━━━
 
 🛒 *Reply in this format*
 
