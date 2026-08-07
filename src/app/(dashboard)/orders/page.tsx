@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getOrders } from "@/services/order.service";
 import { OrderHeader } from "@/components/orders/order-header";
 import { OrderTable } from "@/components/orders/order-table";

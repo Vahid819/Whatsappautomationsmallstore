@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { MenuHeader } from "@/components/menu/menu-header";
 import { MenuStats } from "@/components/menu/menu-stats";
 import { MenuTable } from "@/components/menu/menu-table";

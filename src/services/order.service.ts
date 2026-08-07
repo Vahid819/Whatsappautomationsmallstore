@@ -58,6 +58,15 @@ export async function getOrders(): Promise<Order[]> {
       .orderBy("createdAt", "desc")
       .get();
 
+    console.log("=================================");
+    console.log("Orders found:", snapshot.size);
+
+    snapshot.docs.forEach((doc) => {
+      console.log(doc.id, doc.data());
+    });
+
+    console.log("=================================");
+
     return snapshot.docs.map(mapOrder);
   } catch (error) {
     console.error("Failed to fetch orders:", error);
