@@ -2,17 +2,94 @@
 
 import { revalidatePath } from "next/cache";
 
+import {
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from "@/services/dashboard/product.service";
+
 import { ProductFormValues } from "@/schemas/productSchema";
-import { createProduct } from "@/services/dashboard/product.service";
 
-export async function createProductAction(values: ProductFormValues) {
-  const result = await createProduct(values);
+// ==========================================
+// Create Product
+// ==========================================
 
-  if (!result.success) {
+export async function createProductAction(
+  values: ProductFormValues
+) {
+  try {
+    const result = await createProduct(values);
+
+    if (!result.success) {
+      return result;
+    }
+
+    revalidatePath("/dashboard/products");
+
     return result;
+  } catch (error) {
+    console.error("Create product error:", error);
+
+    return {
+      success: false,
+      message: "Failed to create product.",
+    };
   }
+}
 
-  revalidatePath("/products");
+// ==========================================
+// Update Product
+// ==========================================
 
-  return result;
+export async function updateProductAction(
+  productId: string,
+  values: ProductFormValues
+) {
+  try {
+    const result = await updateProduct(
+      productId,
+      values
+    );
+
+    if (!result.success) {
+      return result;
+    }
+
+    revalidatePath("/dashboard/products");
+
+    return result;
+  } catch (error) {
+    console.error("Update product error:", error);
+
+    return {
+      success: false,
+      message: "Failed to update product.",
+    };
+  }
+}
+
+// ==========================================
+// Delete Product
+// ==========================================
+
+export async function deleteProductAction(
+  productId: string
+) {
+  try {
+    await deleteProduct(productId);
+
+    revalidatePath("/dashboard/products");
+
+    return {
+      success: true,
+      message: "Product deleted successfully.",
+    };
+  } catch (error) {
+    console.error("Delete product error:", error);
+
+    return {
+      success: false,
+      message: "Failed to delete product.",
+    };
+  }
 }
