@@ -40,7 +40,7 @@ export function DoneOrderButton({
   return (
     <Button
       type="button"
-      size="sm"
+      className="w-full"
       onClick={handleDone}
       disabled={isPending}
     >
@@ -52,7 +52,7 @@ export function DoneOrderButton({
       ) : (
         <>
           <Check className="mr-2 h-4 w-4" />
-          Done
+          Delivered
         </>
       )}
     </Button>
