@@ -1,10 +1,8 @@
-import Link from "next/link";
-
-import { Eye } from "lucide-react";
-
 import { Order } from "@/types/order";
 
 import { StatusBadge } from "./status-badge";
+import { MapButton } from "./map-button";
+import { DoneOrderButton } from "./done-order-button";
 
 import {
   TableCell,
@@ -18,11 +16,17 @@ interface OrderRowProps {
 export function OrderRow({
   order,
 }: OrderRowProps) {
+  const canMarkDelivered =
+    order.status !== "DELIVERED" &&
+    order.status !== "CANCELLED";
+
   return (
     <TableRow>
       {/* Order Number */}
-      <TableCell className="font-semibold">
-        #{order.orderNumber}
+      <TableCell>
+        <span className="font-medium">
+          #{order.orderNumber}
+        </span>
       </TableCell>
 
       {/* Customer */}
@@ -38,10 +42,10 @@ export function OrderRow({
 
       {/* Products */}
       <TableCell>
-        <div className="space-y-1">
+        <div className="max-w-[240px] space-y-1">
           {order.items.slice(0, 2).map((item) => (
             <div
-              key={item.productId}
+              key={`${item.productId}-${item.productNumber}`}
               className="text-sm"
             >
               {item.name} × {item.quantity}
@@ -57,8 +61,10 @@ export function OrderRow({
       </TableCell>
 
       {/* Total */}
-      <TableCell className="font-medium">
-        ₹{order.totalAmount}
+      <TableCell>
+        <span className="font-semibold">
+          ₹{order.totalAmount}
+        </span>
       </TableCell>
 
       {/* Payment */}
@@ -80,15 +86,19 @@ export function OrderRow({
           : "-"}
       </TableCell>
 
-      {/* Action */}
+      {/* Actions */}
       <TableCell>
-        <Link
-          href={`/dashboard/orders/${order.id}`}
-          className="inline-flex items-center gap-1 text-primary hover:underline"
-        >
-          <Eye className="h-4 w-4" />
-          View
-        </Link>
+        <div className="flex items-center justify-end gap-2">
+          <MapButton
+            address={order.customerAddress}
+          />
+
+          {canMarkDelivered && (
+            <DoneOrderButton
+              orderId={order.id}
+            />
+          )}
+        </div>
       </TableCell>
     </TableRow>
   );
