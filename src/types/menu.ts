@@ -5,7 +5,6 @@ export interface Menu {
   variant: string;
   description: string;
   category: string;
-  categoryId: string;
   price: number;
   available: boolean;
   image?: string;
