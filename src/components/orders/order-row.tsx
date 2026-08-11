@@ -80,26 +80,35 @@ export function OrderRow({
       {/* Date */}
       <TableCell>
         {order.createdAt
-          ? new Date(order.createdAt).toLocaleDateString(
-              "en-IN"
-            )
+          ? new Date(
+              order.createdAt
+            ).toLocaleDateString("en-IN")
           : "-"}
       </TableCell>
 
       {/* Actions */}
       <TableCell>
-        <div className="flex items-center justify-end gap-2">
-          <MapButton
-            address={order.customerAddress}
-          />
+  <div className="mt-4">
+  {order.status !== "DELIVERED" &&
+    order.status !== "CANCELLED" && (
+      <div className="grid grid-cols-2 gap-2">
+        <MapButton
+          address={order.customerAddress}
+        />
 
-          {canMarkDelivered && (
-            <DoneOrderButton
-              orderId={order.id}
-            />
-          )}
-        </div>
-      </TableCell>
+        <DoneOrderButton
+          orderId={order.id}
+        />
+      </div>
+    )}
+
+  {order.status === "DELIVERED" && (
+    <div className="flex items-center justify-center rounded-md border px-3 py-3 text-sm font-medium text-muted-foreground">
+      ✓ Order Delivered
+    </div>
+  )}
+</div>
+</TableCell>
     </TableRow>
   );
 }
