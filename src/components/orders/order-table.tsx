@@ -44,7 +44,7 @@ export function OrderTable({
                   <TableHead>Payment</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Date</TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-center">
                     Action
                   </TableHead>
                 </TableRow>

@@ -171,7 +171,7 @@ export function MenuTable({ menus }: MenuTableProps) {
       {/* EDIT */}
       <DropdownMenuItem>
         <Link
-          href={`/dashboard/products/${item.id}/edit`}
+          href={`/dashboard/products/${item.id}/edit`} className="flex"
         >
           <Pencil className="mr-2 h-4 w-4" />
           Edit
