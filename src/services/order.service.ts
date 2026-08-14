@@ -58,14 +58,6 @@ export async function getOrders(): Promise<Order[]> {
       .orderBy("createdAt", "desc")
       .get();
 
-    console.log("=================================");
-    console.log("Orders found:", snapshot.size);
-
-    snapshot.docs.forEach((doc) => {
-      console.log(doc.id, doc.data());
-    });
-
-    console.log("=================================");
 
     return snapshot.docs.map(mapOrder);
   } catch (error) {
@@ -103,8 +95,6 @@ export async function createOrder(
   data: Omit<Order, "id" | "orderNumber">
 ): Promise<string> {
   try {
-    console.log("========== CREATE ORDER ==========");
-    console.log(JSON.stringify(data, null, 2));
 
     const orderNumber = await getNextOrderNumber();
 

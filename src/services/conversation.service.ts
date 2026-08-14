@@ -168,11 +168,7 @@ Please send *MENU* to view the latest menu.`
       // ===========================================
 
       const savedCustomer = await getCustomer(phone);
-
-console.log(
-  "Saved cart:",
-  JSON.stringify(savedCustomer?.cart, null, 2)
-);
+      
       await updateCustomer(phone, {
         cart,
         state: ConversationState.WAITING_CONFIRMATION,
@@ -244,10 +240,6 @@ console.log(
           0
         );
 
-        console.log(
-  "Order items:",
-  JSON.stringify(latestCustomer.cart, null, 2)
-);
 
         const orderId = await createOrder({
           customerId: latestCustomer.phone,

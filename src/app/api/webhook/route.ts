@@ -22,9 +22,6 @@ export async function GET(req: NextRequest) {
 export async function POST(req: Request) {
   const body: WhatsAppWebhook = await req.json();
 
-  console.log("🔥 WEBHOOK HIT");
-  console.log(JSON.stringify(body, null, 2));
-
   const value = body.entry?.[0]?.changes?.[0]?.value;
 
   // Handle incoming customer messages

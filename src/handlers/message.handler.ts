@@ -29,17 +29,11 @@ export async function handleIncomingMessage(
     const name =
       contact?.profile?.name || "Customer";
 
-    console.log("📩 New Message");
-    console.log("👤 Name:", name);
-    console.log("📞 Phone:", phone);
-    console.log("💬 Message:", text);
-
     // ==========================================
     // MENU REQUEST
     // ==========================================
 
     if (text.toUpperCase() === "MENU") {
-      console.log("🛒 MENU requested");
 
       const token =
         await createCustomerOrderToken(phone);
@@ -62,10 +56,6 @@ ${orderUrl}
       await sendTextMessage(
         phone,
         messageText
-      );
-
-      console.log(
-        "✅ Customer order link sent"
       );
 
       return;

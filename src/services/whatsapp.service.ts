@@ -27,7 +27,6 @@ export async function sendTextMessage(
       }
     );
 
-    console.log("✅ Message sent successfully");
     return response.data;
   } catch (error: any) {
     console.error(

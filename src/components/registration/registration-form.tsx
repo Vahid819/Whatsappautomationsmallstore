@@ -50,9 +50,6 @@ export default function RegistrationForm({
 
   const onSubmit = async (data: CustomerInput) => {
     try {
-      console.log("🔥 onSubmit called");
-      console.log("Token:", token);
-      console.log("Data:", data);
 
       setLoading(true);
 

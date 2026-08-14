@@ -14,10 +14,8 @@ import {
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("========== REGISTER API ==========");
 
     const body = await request.json();
-    console.log("Request Body:", body);
 
     // Check token
     if (!body.token) {
@@ -34,8 +32,6 @@ export async function POST(request: NextRequest) {
 
     // Verify token
     const registration = await verifyRegistrationToken(body.token);
-
-    console.log("Registration Token:", registration);
 
     if (!registration) {
       console.log("❌ Invalid token");
@@ -68,12 +64,8 @@ export async function POST(request: NextRequest) {
 
     const phone = registration.phone;
 
-    console.log("Phone:", phone);
-
     // Already registered?
     const customer = await getCustomer(phone);
-
-    console.log("Existing Customer:", customer);
 
     if (customer) {
       return NextResponse.json(
@@ -85,8 +77,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("Creating Customer...");
-
     await createCustomer({
       phone,
       mobile: phone,
@@ -97,11 +87,7 @@ export async function POST(request: NextRequest) {
       instructions: result.data.instructions,
     });
 
-    console.log("✅ Customer Created");
-
     await deleteRegistrationToken(body.token);
-
-    console.log("✅ Token Deleted");
 
     return NextResponse.json(
       {

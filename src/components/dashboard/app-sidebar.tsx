@@ -18,6 +18,7 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import { LogoutButton } from "@/components/logoutbutton";
 
 const items = [
   {
@@ -77,6 +78,7 @@ export function AppSidebar() {
 
       <SidebarFooter className="border-t p-4">
         <p className="text-xs text-muted-foreground">© 2026 MominEgg</p>
+        <LogoutButton />
       </SidebarFooter>
     </Sidebar>
   );
