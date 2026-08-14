@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, MapPin, ShoppingBag } from "lucide-react";
+import {
+  Loader2,
+  MapPin,
+  ShoppingBag,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { placeCustomerOrder } from "@/actions/customer-order.actions";
@@ -28,7 +32,6 @@ interface CheckoutDialogProps {
   cart: CartItem[];
 
   subtotal: number;
-  deliveryCharge: number;
   totalAmount: number;
 
   token: string;
@@ -36,29 +39,32 @@ interface CheckoutDialogProps {
   onOrderPlaced?: () => void;
 }
 
+const MINIMUM_ORDER_AMOUNT = 200;
+
 export function CheckoutDialog({
   open,
   onOpenChange,
   customer,
   cart,
   subtotal,
-  deliveryCharge,
   totalAmount,
   token,
   onOrderPlaced,
 }: CheckoutDialogProps) {
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, setIsPending] =
+    useState(false);
 
   const [address, setAddress] = useState(
     customer.address ?? ""
   );
 
-  const [landmark, setLandmark] = useState(
-    customer.landmark ?? ""
-  );
+  const [landmark, setLandmark] =
+    useState(customer.landmark ?? "");
 
   const [instructions, setInstructions] =
-    useState(customer.instructions ?? "");
+    useState(
+      customer.instructions ?? ""
+    );
 
   const [paymentMethod, setPaymentMethod] =
     useState<"COD" | "UPI">("COD");
@@ -67,9 +73,15 @@ export function CheckoutDialog({
     return null;
   }
 
+  // ==========================================
+  // Place Order
+  // ==========================================
+
   async function handlePlaceOrder() {
     if (!address.trim()) {
-      toast.error("Please enter your delivery address.");
+      toast.error(
+        "Please enter your delivery address."
+      );
       return;
     }
 
@@ -78,34 +90,45 @@ export function CheckoutDialog({
       return;
     }
 
+    if (subtotal < MINIMUM_ORDER_AMOUNT) {
+      toast.error(
+        `Minimum order amount is ₹${MINIMUM_ORDER_AMOUNT}.`
+      );
+      return;
+    }
+
     try {
       setIsPending(true);
 
-      const result = await placeCustomerOrder({
-        token,
+      const result =
+        await placeCustomerOrder({
+          token,
 
-        items: cart.map((item) => ({
-          productId: item.id,
-          quantity: item.quantity,
-        })),
+          items: cart.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity,
+          })),
 
-        paymentMethod,
+          paymentMethod,
 
-        customerAddress: address.trim(),
+          customerAddress:
+            address.trim(),
 
-        customerLandmark:
-          landmark.trim(),
+          customerLandmark:
+            landmark.trim(),
 
-        customerInstructions:
-          instructions.trim(),
-      });
+          customerInstructions:
+            instructions.trim(),
+        });
 
       if (!result.success) {
         toast.error(result.message);
         return;
       }
 
-      toast.success("Order placed successfully!");
+      toast.success(
+        "Order placed successfully!"
+      );
 
       onOpenChange(false);
 
@@ -130,7 +153,10 @@ export function CheckoutDialog({
 
       <div className="w-full max-w-lg overflow-hidden rounded-2xl border bg-background shadow-xl">
 
+        {/* ================================== */}
         {/* Header */}
+        {/* ================================== */}
+
         <div className="border-b p-5">
 
           <div className="flex items-center gap-3">
@@ -140,23 +166,32 @@ export function CheckoutDialog({
             </div>
 
             <div>
+
               <h2 className="text-xl font-bold">
                 Checkout
               </h2>
 
               <p className="text-sm text-muted-foreground">
-                Review your order before placing it.
+                Review your order before
+                placing it.
               </p>
+
             </div>
 
           </div>
 
         </div>
 
+        {/* ================================== */}
         {/* Content */}
+        {/* ================================== */}
+
         <div className="max-h-[75vh] overflow-y-auto p-5">
 
+          {/* ================================= */}
           {/* Customer */}
+          {/* ================================= */}
+
           <div className="mb-6 rounded-xl border bg-muted/30 p-4">
 
             <h3 className="mb-3 font-semibold">
@@ -184,10 +219,16 @@ export function CheckoutDialog({
 
           </div>
 
+          {/* ================================= */}
           {/* Address */}
+          {/* ================================= */}
+
           <div className="space-y-4">
 
+            {/* Delivery Address */}
+
             <div>
+
               <label
                 htmlFor="address"
                 className="mb-2 block text-sm font-medium"
@@ -203,7 +244,9 @@ export function CheckoutDialog({
                   id="address"
                   value={address}
                   onChange={(event) =>
-                    setAddress(event.target.value)
+                    setAddress(
+                      event.target.value
+                    )
                   }
                   rows={3}
                   disabled={isPending}
@@ -212,9 +255,11 @@ export function CheckoutDialog({
                 />
 
               </div>
+
             </div>
 
             {/* Landmark */}
+
             <div>
 
               <label
@@ -228,7 +273,9 @@ export function CheckoutDialog({
                 id="landmark"
                 value={landmark}
                 onChange={(event) =>
-                  setLandmark(event.target.value)
+                  setLandmark(
+                    event.target.value
+                  )
                 }
                 disabled={isPending}
                 placeholder="Near school, temple, etc."
@@ -238,6 +285,7 @@ export function CheckoutDialog({
             </div>
 
             {/* Instructions */}
+
             <div>
 
               <label
@@ -251,7 +299,9 @@ export function CheckoutDialog({
                 id="instructions"
                 value={instructions}
                 onChange={(event) =>
-                  setInstructions(event.target.value)
+                  setInstructions(
+                    event.target.value
+                  )
                 }
                 rows={2}
                 disabled={isPending}
@@ -263,7 +313,10 @@ export function CheckoutDialog({
 
           </div>
 
+          {/* ================================= */}
           {/* Payment */}
+          {/* ================================= */}
+
           <div className="mt-6">
 
             <h3 className="mb-3 font-semibold">
@@ -273,6 +326,7 @@ export function CheckoutDialog({
             <div className="grid gap-3 sm:grid-cols-2">
 
               {/* COD */}
+
               <button
                 type="button"
                 disabled={isPending}
@@ -285,16 +339,20 @@ export function CheckoutDialog({
                     : "hover:bg-accent"
                 }`}
               >
+
                 <p className="font-semibold">
                   Cash on Delivery
                 </p>
 
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Pay when your order arrives.
+                  Pay when your order
+                  arrives.
                 </p>
+
               </button>
 
               {/* UPI */}
+
               <button
                 type="button"
                 disabled={isPending}
@@ -307,6 +365,7 @@ export function CheckoutDialog({
                     : "hover:bg-accent"
                 }`}
               >
+
                 <p className="font-semibold">
                   UPI
                 </p>
@@ -314,18 +373,24 @@ export function CheckoutDialog({
                 <p className="mt-1 text-xs text-muted-foreground">
                   Pay using UPI.
                 </p>
+
               </button>
 
             </div>
 
           </div>
 
+          {/* ================================= */}
           {/* Order Summary */}
+          {/* ================================= */}
+
           <div className="mt-6 rounded-xl border p-4">
 
             <h3 className="mb-4 font-semibold">
               Order Summary
             </h3>
+
+            {/* Products */}
 
             <div className="space-y-3">
 
@@ -361,31 +426,37 @@ export function CheckoutDialog({
 
             <div className="my-4 border-t" />
 
-            <div className="space-y-2 text-sm">
+            {/* Subtotal */}
 
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  Subtotal
-                </span>
+            <div className="flex justify-between text-sm">
 
-                <span>
-                  ₹{subtotal}
-                </span>
-              </div>
+              <span className="text-muted-foreground">
+                Subtotal
+              </span>
 
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  Delivery
-                </span>
+              <span>
+                ₹{subtotal}
+              </span>
 
-                <span>
-                  ₹{deliveryCharge}
-                </span>
-              </div>
+            </div>
+
+            {/* Minimum Order */}
+
+            <div className="mt-3 flex justify-between text-sm">
+
+              <span className="text-muted-foreground">
+                Minimum Order
+              </span>
+
+              <span>
+                ₹{MINIMUM_ORDER_AMOUNT}
+              </span>
 
             </div>
 
             <div className="my-4 border-t" />
+
+            {/* Total */}
 
             <div className="flex items-center justify-between">
 
@@ -403,7 +474,10 @@ export function CheckoutDialog({
 
         </div>
 
+        {/* ================================== */}
         {/* Footer */}
+        {/* ================================== */}
+
         <div className="flex gap-3 border-t p-5">
 
           <button
@@ -419,10 +493,15 @@ export function CheckoutDialog({
 
           <button
             type="button"
-            disabled={isPending}
+            disabled={
+              isPending ||
+              subtotal <
+                MINIMUM_ORDER_AMOUNT
+            }
             onClick={handlePlaceOrder}
             className="flex flex-1 items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
+
             {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -431,6 +510,7 @@ export function CheckoutDialog({
             ) : (
               `Place Order • ₹${totalAmount}`
             )}
+
           </button>
 
         </div>
