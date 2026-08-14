@@ -16,38 +16,98 @@ export interface MenuItem {
   category: string;
 
   price: number;
-   image?: string;
+
+  image?: string;
 
   available: boolean;
-} 
 
-const menuCollection = adminDb.collection("products");
+  createdAt?: string | null;
 
-/**
- * Get all available menu items
- */
-export async function getMenuItems(): Promise<MenuItem[]> {
+  updatedAt?: string | null;
+}
+
+const menuCollection =
+  adminDb.collection("products");
+
+// ==========================================
+// Map Firestore Product → Plain MenuItem
+// ==========================================
+
+function mapMenuItem(
+  doc: FirebaseFirestore.QueryDocumentSnapshot
+): MenuItem {
+  const data = doc.data();
+
+  return {
+    id: doc.id,
+
+    productNumber:
+      data.productNumber ?? 0,
+
+    name:
+      data.name ?? "",
+
+    variant:
+      data.variant ?? "",
+
+    description:
+      data.description ?? "",
+
+    category:
+      data.category ?? "",
+
+    price:
+      Number(data.price ?? 0),
+
+    image:
+      data.image ?? "",
+
+    available:
+      data.available ?? false,
+
+    createdAt:
+      data.createdAt?.toDate?.()?.toISOString() ??
+      null,
+
+    updatedAt:
+      data.updatedAt?.toDate?.()?.toISOString() ??
+      null,
+  };
+}
+
+// ==========================================
+// Get all available menu items
+// ==========================================
+
+export async function getMenuItems(): Promise<
+  MenuItem[]
+> {
   const snapshot = await menuCollection
     .where("available", "==", true)
     .orderBy("productNumber", "asc")
     .get();
 
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...(doc.data() as Omit<MenuItem, "id">),
-  }));
+  return snapshot.docs.map(mapMenuItem);
 }
 
+// ==========================================
+// Get menu item by product number
+// ==========================================
 
-/**
- * Get menu item by number (1,2,3...)
- */
 export async function getMenuItemByNumber(
   number: number
 ): Promise<MenuItem | null> {
   const snapshot = await menuCollection
-    .where("productNumber", "==", number)
-    .where("available", "==", true)
+    .where(
+      "productNumber",
+      "==",
+      number
+    )
+    .where(
+      "available",
+      "==",
+      true
+    )
     .limit(1)
     .get();
 
@@ -55,53 +115,65 @@ export async function getMenuItemByNumber(
     return null;
   }
 
-  return {
-    id: snapshot.docs[0].id,
-    ...(snapshot.docs[0].data() as Omit<MenuItem, "id">),
-  };
+  return mapMenuItem(
+    snapshot.docs[0]
+  );
 }
 
-/**
- * Get available menu items (WhatsApp)
- */
-export async function getAvailableMenus(): Promise<MenuItem[]> {
+// ==========================================
+// Get available menu items
+// ==========================================
+
+export async function getAvailableMenus(): Promise<
+  MenuItem[]
+> {
   const snapshot = await menuCollection
     .where("available", "==", true)
     .orderBy("productNumber", "asc")
     .get();
 
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...(doc.data() as Omit<MenuItem, "id">),
-  }));
+  return snapshot.docs.map(mapMenuItem);
 }
 
-/**
- * Generate WhatsApp menu message
- */
+// ==========================================
+// Generate WhatsApp menu message
+// ==========================================
+
 export async function getMenuMessage(): Promise<string> {
-  const products = await getAvailableMenus();
+  const products =
+    await getAvailableMenus();
 
   if (products.length === 0) {
     return "❌ No products available.";
   }
 
-  let message = "🥚 *PRIME PROTEINS MENU*\n\n";
+  let message =
+    "🥚 *PRIME PROTEINS MENU*\n\n";
 
-  const groupedProducts: Record<string, MenuItem[]> = {};
+  const groupedProducts: Record<
+    string,
+    MenuItem[]
+  > = {};
 
   for (const product of products) {
-    if (!groupedProducts[product.category]) {
+    if (
+      !groupedProducts[product.category]
+    ) {
       groupedProducts[product.category] = [];
     }
 
-    groupedProducts[product.category].push(product);
+    groupedProducts[
+      product.category
+    ].push(product);
   }
 
-  for (const category of Object.keys(groupedProducts)) {
+  for (const category of Object.keys(
+    groupedProducts
+  )) {
     message += `📦 *${category}*\n`;
 
-    for (const product of groupedProducts[category]) {
+    for (const product of
+      groupedProducts[category]) {
       message += `${product.productNumber}. ${product.name} ........ ₹${product.price}\n`;
     }
 
