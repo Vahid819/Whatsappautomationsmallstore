@@ -15,6 +15,19 @@ export function middleware(
     request.cookies.get("session")?.value;
 
   // ==========================================
+  // PUBLIC AUTH API
+  // ==========================================
+
+  // These routes must be accessible
+  // before a session exists.
+  if (
+    pathname === "/api/auth/session" ||
+    pathname === "/api/auth/logout"
+  ) {
+    return NextResponse.next();
+  }
+
+  // ==========================================
   // CUSTOMER ORDER PAGE
   // ==========================================
 
@@ -23,6 +36,7 @@ export function middleware(
       searchParams.get("token");
 
     // /order without token
+    // is not a valid customer order page.
     if (!token) {
       return NextResponse.redirect(
         new URL("/login", request.url)
@@ -30,9 +44,8 @@ export function middleware(
     }
 
     // Token exists.
-    // Allow the order page to load.
-    // Your server page will validate
-    // the token against Firestore.
+    // The order page/service will
+    // validate the token against Firestore.
     return NextResponse.next();
   }
 
@@ -43,7 +56,10 @@ export function middleware(
   if (pathname === "/login") {
     if (session) {
       return NextResponse.redirect(
-        new URL("/dashboard", request.url)
+        new URL(
+          "/dashboard",
+          request.url
+        )
       );
     }
 
@@ -59,7 +75,10 @@ export function middleware(
   ) {
     if (!session) {
       const loginUrl =
-        new URL("/login", request.url);
+        new URL(
+          "/login",
+          request.url
+        );
 
       loginUrl.searchParams.set(
         "redirect",
@@ -70,6 +89,8 @@ export function middleware(
         loginUrl
       );
     }
+
+    return NextResponse.next();
   }
 
   // ==========================================
