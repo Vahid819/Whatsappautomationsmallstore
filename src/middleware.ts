@@ -24,6 +24,25 @@ export function middleware(request: NextRequest) {
   }
 
   // ==========================================
+  // PUBLIC CUSTOMER REGISTRATION
+  // ==========================================
+
+  if (pathname === "/register") {
+    const token = searchParams.get("token");
+
+    // Token is required
+    if (!token) {
+      return NextResponse.redirect(
+        new URL("/login", request.url)
+      );
+    }
+
+    // Allow registration page without session
+    // The register page/API should validate the token.
+    return NextResponse.next();
+  }
+
+  // ==========================================
   // CUSTOMER ORDER PAGE
   // ==========================================
 
