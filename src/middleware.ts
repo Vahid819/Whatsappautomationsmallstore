@@ -1,5 +1,3 @@
-// src/middleware.ts
-
 import {
   NextRequest,
   NextResponse,
@@ -14,31 +12,27 @@ export function middleware(request: NextRequest) {
   // PUBLIC API ROUTES
   // ==========================================
 
-  // Authentication APIs and WhatsApp/Meta webhook
-  // must be accessible without a session cookie.
   if (
     pathname.startsWith("/api/auth/") ||
+    pathname === "/api/register" ||
     pathname.startsWith("/api/webhook")
   ) {
     return NextResponse.next();
   }
 
   // ==========================================
-  // PUBLIC CUSTOMER REGISTRATION
+  // PUBLIC CUSTOMER REGISTRATION PAGE
   // ==========================================
 
   if (pathname === "/register") {
     const token = searchParams.get("token");
 
-    // Token is required
     if (!token) {
       return NextResponse.redirect(
         new URL("/login", request.url)
       );
     }
 
-    // Allow registration page without session
-    // The register page/API should validate the token.
     return NextResponse.next();
   }
 
@@ -49,15 +43,12 @@ export function middleware(request: NextRequest) {
   if (pathname === "/order") {
     const token = searchParams.get("token");
 
-    // /order without token is invalid
     if (!token) {
       return NextResponse.redirect(
         new URL("/login", request.url)
       );
     }
 
-    // Token exists.
-    // The order page/service validates it.
     return NextResponse.next();
   }
 
