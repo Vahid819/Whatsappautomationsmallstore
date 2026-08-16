@@ -5,24 +5,20 @@ import {
   NextResponse,
 } from "next/server";
 
-export function middleware(
-  request: NextRequest
-) {
-  const { pathname, searchParams } =
-    request.nextUrl;
+export function middleware(request: NextRequest) {
+  const { pathname, searchParams } = request.nextUrl;
 
-  const session =
-    request.cookies.get("session")?.value;
+  const session = request.cookies.get("session")?.value;
 
   // ==========================================
-  // PUBLIC AUTH API
+  // PUBLIC API ROUTES
   // ==========================================
 
-  // These routes must be accessible
-  // before a session exists.
+  // Authentication APIs and WhatsApp/Meta webhook
+  // must be accessible without a session cookie.
   if (
-    pathname === "/api/auth/session" ||
-    pathname === "/api/auth/logout"
+    pathname.startsWith("/api/auth/") ||
+    pathname.startsWith("/api/webhook")
   ) {
     return NextResponse.next();
   }
@@ -32,11 +28,9 @@ export function middleware(
   // ==========================================
 
   if (pathname === "/order") {
-    const token =
-      searchParams.get("token");
+    const token = searchParams.get("token");
 
-    // /order without token
-    // is not a valid customer order page.
+    // /order without token is invalid
     if (!token) {
       return NextResponse.redirect(
         new URL("/login", request.url)
@@ -44,8 +38,7 @@ export function middleware(
     }
 
     // Token exists.
-    // The order page/service will
-    // validate the token against Firestore.
+    // The order page/service validates it.
     return NextResponse.next();
   }
 
@@ -56,10 +49,7 @@ export function middleware(
   if (pathname === "/login") {
     if (session) {
       return NextResponse.redirect(
-        new URL(
-          "/dashboard",
-          request.url
-        )
+        new URL("/dashboard", request.url)
       );
     }
 
@@ -70,24 +60,19 @@ export function middleware(
   // DASHBOARD
   // ==========================================
 
-  if (
-    pathname.startsWith("/dashboard")
-  ) {
+  if (pathname.startsWith("/dashboard")) {
     if (!session) {
-      const loginUrl =
-        new URL(
-          "/login",
-          request.url
-        );
+      const loginUrl = new URL(
+        "/login",
+        request.url
+      );
 
       loginUrl.searchParams.set(
         "redirect",
         pathname
       );
 
-      return NextResponse.redirect(
-        loginUrl
-      );
+      return NextResponse.redirect(loginUrl);
     }
 
     return NextResponse.next();
