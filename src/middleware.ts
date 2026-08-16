@@ -21,7 +21,15 @@ export function middleware(request: NextRequest) {
   }
 
   // ==========================================
-  // PUBLIC CUSTOMER REGISTRATION PAGE
+  // PUBLIC PAGES
+  // ==========================================
+
+  if (pathname === "/success") {
+    return NextResponse.next();
+  }
+
+  // ==========================================
+  // PUBLIC CUSTOMER REGISTRATION
   // ==========================================
 
   if (pathname === "/register") {

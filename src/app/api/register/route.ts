@@ -14,68 +14,85 @@ import {
 
 export async function POST(request: NextRequest) {
   try {
-
     const body = await request.json();
 
-    // Check token
-    if (!body.token) {
-      console.log("❌ Token missing");
+    // ==========================================
+    // TOKEN REQUIRED
+    // ==========================================
 
+    if (!body.token) {
       return NextResponse.json(
         {
           success: false,
-          message: "Token is required",
+          message: "Registration token is required",
         },
         { status: 400 }
       );
     }
 
-    // Verify token
-    const registration = await verifyRegistrationToken(body.token);
+    // ==========================================
+    // VERIFY TOKEN
+    // ==========================================
+
+    const registration = await verifyRegistrationToken(
+      body.token
+    );
 
     if (!registration) {
-      console.log("❌ Invalid token");
-
       return NextResponse.json(
         {
           success: false,
-          message: "Invalid or expired token",
+          message: "Registration link is invalid or expired",
         },
         { status: 400 }
       );
     }
 
-    // Validate form data
+    // ==========================================
+    // VALIDATE CUSTOMER DATA
+    // ==========================================
+
     const result = customerSchema.safeParse(body);
 
     if (!result.success) {
-      console.log("❌ Validation Failed");
-      console.log(result.error.flatten());
-
       return NextResponse.json(
         {
           success: false,
-          message: "Validation failed",
+          message: "Please check your information",
           errors: result.error.flatten(),
         },
         { status: 400 }
       );
     }
 
+    // ==========================================
+    // GET PHONE FROM VERIFIED TOKEN
+    // ==========================================
+
     const phone = registration.phone;
 
-    // Already registered?
-    const customer = await getCustomer(phone);
+    // ==========================================
+    // CHECK EXISTING CUSTOMER
+    // ==========================================
 
-    if (customer) {
+    const existingCustomer = await getCustomer(phone);
+
+    if (existingCustomer) {
+      // Token is no longer useful
+      await deleteRegistrationToken(body.token);
+
       return NextResponse.json(
         {
           success: false,
-          message: "Customer already registered",
+          message: "Customer is already registered",
         },
         { status: 409 }
       );
     }
+
+    // ==========================================
+    // CREATE CUSTOMER
+    // ==========================================
 
     await createCustomer({
       phone,
@@ -87,7 +104,15 @@ export async function POST(request: NextRequest) {
       instructions: result.data.instructions,
     });
 
+    // ==========================================
+    // DELETE TOKEN AFTER SUCCESS
+    // ==========================================
+
     await deleteRegistrationToken(body.token);
+
+    // ==========================================
+    // SUCCESS
+    // ==========================================
 
     return NextResponse.json(
       {
@@ -102,7 +127,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message: "Internal Server Error",
+        message: "Registration failed. Please try again.",
       },
       { status: 500 }
     );
